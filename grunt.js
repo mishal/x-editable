@@ -1,69 +1,83 @@
 function getFiles() {
-    //directories  
+    //directories
     var
     lib = 'src/',
     forms = lib+'editable-form/',
     inputs = lib+'inputs/',
-    containers = lib+'containers/';  
+    containers = lib+'containers/';
 
-    //config for different cores of lib 
+    //config for different cores of lib
     var config = {
         bootstrap: {
             form: [forms+'editable-form-bootstrap.js'],
             container: [containers+'editable-popover.js'],
             inputs: [
-                inputs+'date/date.js', 
-                inputs+'date/datefield.js', 
+                inputs+'date/date.js',
+                inputs+'date/datefield.js',
                 inputs+'date/bootstrap-datepicker/js/bootstrap-datepicker.js',
                 inputs+'typeahead.js'
-                ], 
+                ],
             css: [inputs+'date/bootstrap-datepicker/css/datepicker.css']
-        },  
+        },
         jqueryui: {
             form: [forms+'editable-form-jqueryui.js'],
             container: [containers+'editable-tooltip.js'],
             inputs: [
                inputs+'dateui/dateui.js',
                inputs+'dateui/dateuifield.js'
-            ], 
+            ],
             css: []
-        },  
+        },
         jquery: {
             form: [],
             container: [containers+'editable-poshytip.js'],
             inputs: [
                inputs+'dateui/dateui.js',
                inputs+'dateui/dateuifield.js'
-            ],            
+            ],
             css: []
-        }      
+        },
+        custom: {
+            form: [forms+'editable-form-bootstrap.js'],
+            container: [containers+'editable-popover.js'],
+            inputs: [
+                // inputs+'date/date.js',
+                // inputs+'date/datefield.js',
+                // inputs+'date/bootstrap-datepicker/js/bootstrap-datepicker.js',
+                // I wil user Jquery UI datepicker
+                inputs+'dateui/dateui.js',
+                inputs+'dateui/dateuifield.js',
+                inputs+'typeahead.js'
+                ],
+            css: []
+        }
     };
 
-    //common js files 
+    //common js files
     var js = [
     '<banner:meta.banner>',
     forms+'editable-form.js',
     forms+'editable-form-utils.js',
-    containers+'editable-container.js', 
+    containers+'editable-container.js',
     containers+'editable-inline.js',
     lib+'element/editable-element.js',
     inputs+'abstract.js',
     inputs+'list.js',
     inputs+'text.js',
     inputs+'textarea.js',
-    inputs+'select.js',    
+    inputs+'select.js',
     inputs+'checklist.js',
     inputs+'html5types.js',
     inputs+'select2/select2.js',
-    inputs+'combodate/lib/combodate.js', 
-    inputs+'combodate/combodate.js'    
-    ]; 
+    inputs+'combodate/lib/combodate.js',
+    inputs+'combodate/combodate.js'
+    ];
 
     //common css files
     var css = [
     '<banner:meta.banner>',
     forms+'editable-form.css',
-    containers+'editable-container.css', 
+    containers+'editable-container.css',
     lib+'element/editable-element.css'
     ];
 
@@ -82,18 +96,18 @@ function getFiles() {
         min_files[task] = {
             src: ['<banner:meta.banner>', '<config:concat.'+task+'.dest>'],
             dest: dest + '.min.js'
-        };      
+        };
 
         //css
         concat_files[k+'_css'] = {
             src: css.concat(config[k].css),
             dest: folder+'css/'+k+'-editable.css'
         };
-    }  
+    }
 
-    return {concat_files: concat_files, min_files: min_files};  
+    return {concat_files: concat_files, min_files: min_files};
 
-} 
+}
 
 /*global module:false*/
 module.exports = function(grunt) {
@@ -101,24 +115,24 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib');
 
  //module for testing
- var module = ''; 
+ var module = '';
 // module = '&module=textarea';
 //module = '&module=select';
 //module = '&module=text';
 
 //test on several jquery versions
  var qunit_testover = [];
- ['bootstrap', 'jqueryui', 'plain'].forEach(function(f){
+ ['bootstrap', 'jqueryui', 'plain', 'custom'].forEach(function(f){
      ['popup', 'inline'].forEach(function(c){
          ['1.7.2', '1.8.3', '1.9.1'].forEach(function(jqver) {
-             qunit_testover.push('http://localhost:8000/test/index.html?f='+f+'&c='+c+'&jquery='+jqver+module); 
+             qunit_testover.push('http://localhost:8000/test/index.html?f='+f+'&c='+c+'&jquery='+jqver+module);
          });
      });
- });    
+ });
 
  //get js and css for different builds
  var files = getFiles();
- 
+
  // Project configuration.
   grunt.initConfig({
     pkg: '<json:package.json>',
@@ -145,29 +159,33 @@ module.exports = function(grunt) {
       plain: [
                   'http://localhost:8000/test/index.html?f=plain&c=popup'+module,
                   'http://localhost:8000/test/index.html?f=plain&c=inline'+module
-                 ],            
-      //test all builds under several versions of jquery                                   
+                 ],
+      custom: [
+                  'http://localhost:8000/test/index.html?f=custom&c=popup'+module,
+                  'http://localhost:8000/test/index.html?f=custom&c=inline'+module
+                 ],
+      //test all builds under several versions of jquery
       testover: qunit_testover
     },
     server: {
         port: 8000,
         base: '.'
-    },    
-    
+    },
+
     lint: {
      //TODO: lint tests files
-     //files: ['grunt.js', 'src/js/*.js', 'test/**/*.js']     
-      files: ['grunt.js', 
-              'src/editable-form/*.js', 
-              'src/containers/*.js', 
-              'src/element/*.js', 
-              
-              'src/inputs/*.js', 
+     //files: ['grunt.js', 'src/js/*.js', 'test/**/*.js']
+      files: ['grunt.js',
+              'src/editable-form/*.js',
+              'src/containers/*.js',
+              'src/element/*.js',
+
+              'src/inputs/*.js',
               'src/inputs/date/*.js',
               'src/inputs/dateui/*.js',
               'src/inputs/combodate/*.js',
               'src/inputs/select2/*.js',
-              
+
               'src/inputs-ext/address/*.js',
               'src/inputs-ext/wysihtml5/*.js'
               ]
@@ -191,7 +209,7 @@ module.exports = function(grunt) {
         boss: true,
         eqnull: true,
         browser: true,
-        evil: false  
+        evil: false
       },
       globals: {
         jQuery: true
@@ -216,31 +234,31 @@ module.exports = function(grunt) {
             },
             options: {
                basePath: 'inputs-ext'
-            }            
+            }
         },
         ui_datepicker: {
             files: {
              //copy jquery ui datepicker
              '<%= dist %>/jquery-editable/jquery-ui-datepicker/' : 'src/inputs/dateui/jquery-ui-datepicker/**'
          }
-       }         
+       }
     },
- 
+
     uglify: {}
   });
 
   //test task
   grunt.registerTask('test', 'lint server qunit:bootstrap');
-  grunt.registerTask('testall', 'lint server qunit:bootstrap qunit:jqueryui qunit:plain');  
-  grunt.registerTask('testover', 'lint server qunit:testover');  
-  
+  grunt.registerTask('testall', 'lint server qunit:bootstrap qunit:jqueryui qunit:plain');
+  grunt.registerTask('testover', 'lint server qunit:testover');
+
   // Default task.
 //  grunt.registerTask('default', 'lint qunit');
   grunt.registerTask('default', 'clean lint concat min copy');
-  
+
   // build
   grunt.registerTask('build', 'clean lint concat min copy');
-  
- //to run particular task use ":", e.g. copy:libs 
+
+ //to run particular task use ":", e.g. copy:libs
 };
 
