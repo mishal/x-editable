@@ -530,9 +530,10 @@ Editableform is linked with one of input types, e.g. 'text', 'select' etc.
         /**
         Success callback. Called when value successfully sent on server and **response status = 200**.  
         Usefull to work with json response. For example, if your backend response can be <code>{success: true}</code>
-        or <code>{success: false, msg: "server error"}</code> you can check it inside this callback.  
+        or `{success: false, msg: "server error"}` you can check it inside this callback.  
         If it returns **string** - means error occured and string is shown as error message.  
-        If it returns **object like** <code>{newValue: &lt;something&gt;}</code> - it overwrites value, submitted by user.  
+        If it returns **object like** `{newValue: &lt;something&gt;}` - it overwrites value, submitted by user
+        (useful when server changes value).  
         Otherwise newValue simply rendered into element.
         
         @property success 
@@ -2929,7 +2930,9 @@ $(function(){
         activate: function() {
             if(this.$input.is(':visible')) {
                 this.$input.focus();
-                $.fn.editableutils.setCursorPosition(this.$input.get(0), this.$input.val().length);
+                if (this.$input.is('input,textarea') && !this.$input.is('[type="checkbox"],[type="range"]')) {
+                    $.fn.editableutils.setCursorPosition(this.$input.get(0), this.$input.val().length);
+                }
                 if(this.toggleClear) {
                     this.toggleClear();
                 }
